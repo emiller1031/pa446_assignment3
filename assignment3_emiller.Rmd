@@ -1,0 +1,58 @@
+---
+title: "Assignment 3"
+author: "Elizabeth Miller"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part I
+
+Load the data file called ‘car_data.csv’. This data contains information about cars and motorcycles listed on CarDekho.com
+
+```{r, warning = F, echo = F}
+library(tidyverse)
+library(plotly)
+library(GGally)
+library(corrplot)
+```
+
+```{r}
+car <- read_csv("car_data.csv")
+concealed <- read_csv("concealed_carry.csv")
+```
+
+1.  Create a correlogram among selling price, number of kilometers driven, and year the car was bought using the appropriate function in the GGally package. (6 pts)
+
+```{r}
+car %>%
+  select(selling_price, km_driven, year) %>%
+  ggpairs()
+```
+
+
+2.  Plot the relationship between the selling price and year for the automatic and manual cars on the same plot. The points on the graph should:
+
+    1.  be colored based on transmission
+
+    2.  the tooltip should indicate the year, selling price, and transmission type.
+    
+```{r}
+p <- car %>%
+  mutate(myText = paste("Transmission type: " , transmission,
+                        "\nYear:", year,
+                        "\nSelling price:", scales::comma(selling_price))) %>%
+  ggplot(aes(x = year, y = selling_price, 
+             color = transmission, 
+             text = myText)) +
+  geom_point(alpha = 0.7) +
+  scale_y_continuous(labels = scales::comma)
+
+options(scipen=999)
+
+ggplotly(p, tooltip="text")
+```
+
